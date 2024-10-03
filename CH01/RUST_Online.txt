@@ -29,4 +29,34 @@ str2.chars().count());
     println!("{:?}", "国".as_bytes());
     println!("{:?}", " ".as_bytes());
     //arrive at 14 1.4 Type INference
+    let small_number1: u8 = 10;
+    let small_number2 = 10u8;
+    let small_number3 = 10_u8;
+    let big_number1 = 100_000_000_i32;
+    let number2 = 1___6______2____4______i32;
+    println!("number2: {}", number2);
+    
+    let my_float: f64 = 5.0;
+    let my_other_float: f32 = 8.5;
+    let third_float = my_float + my_other_float as f64;
+    
+    let my_float2 = 5.0;
+    let my_other_float2 = 8.5;
+    let third_float2 = my_float2 + my_other_float2;
+    println!("Hello, world number {}!", give_number());
+    println!("Hello, world number2 {}!", give_number2());
+    let multiply_result = multiply(8, 9);
+    println!("The two numbers multiplied are: {multiply_result}");
+    //arrived at 1.7 pg 20
+}
+fn multiply(number_one: i32, number_two: i32) -> i32 {
+    let result = number_one * number_two;
+    result
+}
+fn give_number() -> i32 {
+    8
+}
+fn give_number2() -> i32 {
+    return 8;
+    10;
 }
