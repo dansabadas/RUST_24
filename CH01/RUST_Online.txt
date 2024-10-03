@@ -1,0 +1,32 @@
+fn main() {
+    let mut my_name: String = "Dave".to_string();
+    my_name.push('!');
+    println!("{}", my_name);
+    
+    // Rust programs start with fn main()
+    // You put the code inside a block. It starts with { and ends with }
+    let some_number = 100; // We can write as much as we want here and the ompiler won't look at it
+    let first_letter = 'A';
+    let space = ' ';
+    let other_language_char = 'Ꮔ';
+    let cat_face = '';
+    println!("{}", some_number as u8 as char);
+    let my_number2 = 600;
+    println!("{}", my_number2 as u8);//600 − 256 − 256 = 88
+    println!("Size of a char: {}", std::mem::size_of::<char>());
+    println!("Size of a: {}", "a".len());
+    println!("Size of ß: {}", "ß".len());
+    println!("Size of 国: {}", "国".len());
+    println!("Size of : {}", "".len());
+    let str1 = "Hello!";
+    println!("str1 is {} bytes and also {} characters.", str1.len(),
+str1.chars().count());
+    let str2 = "안녕!";
+    println!("str2 is {} bytes but only {} characters.", str2.len(),
+str2.chars().count());
+    println!("{:?}", "a".as_bytes());
+    println!("{:?}", "ß".as_bytes());
+    println!("{:?}", "国".as_bytes());
+    println!("{:?}", " ".as_bytes());
+    //arrive at 14 1.4 Type INference
+}
