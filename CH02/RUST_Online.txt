@@ -1,0 +1,32 @@
+const NUMBER_OF_MONTHS: u32 = 12;
+
+fn print_months() {
+    println!("Number of months in the year: {NUMBER_OF_MONTHS}");
+    
+    let country = String::from("Austria");
+    let ref_one: &String = &country;
+    let ref_two = &country;
+    println!("{}", ref_one);
+    
+    let mut my_number = 8;
+    let num_ref = &mut my_number;
+    
+    let mut my_number = 8;
+    let num_ref = &mut my_number;
+    *num_ref += 10;
+    println!("{}", my_number);
+    
+    let second_number = 800;
+    let triple_reference = &&&second_number;
+    println!("Are they equal? {}", second_number == ***triple_reference);
+    
+    let mut number = 10;
+    let number_change = &mut number;
+    *number_change += 10;
+    let number_ref = &number;
+    println!("{}", number_ref);
+}
+
+fn main() {
+    print_months();
+}
