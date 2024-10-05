@@ -27,6 +27,87 @@ fn print_months() {
     println!("{}", number_ref);
 }
 
+fn print_country_2(country_name: String) {
+    println!("{country_name}");//wrong version with ownership, no borrowing
+}
+
+fn print_country(country_name: &String) {
+    println!("{}", country_name);
+}
+
+fn add_hungary(country_name: &mut String) {
+    country_name.push_str("-Hungary");
+    println!("Now it says: {country_name}");
+}
+
+fn adds_hungary2(mut string_to_add_hungary_to: String) {
+    string_to_add_hungary_to.push_str("-Hungary");
+    println!("{}", string_to_add_hungary_to);
+}
+
+fn prints_country_3(country_name: String) {
+    println!("{}", country_name);
+}
+
 fn main() {
     print_months();
+    
+    let country = String::from("Austria");
+    let country_ref = &country;
+    let country = 8;
+    println!("{country_ref} {country}");
+    
+    let mut country = String::from("Austria");
+    add_hungary(&mut country);
+
+    print_country(&country);
+    print_country(&country);
+    
+    let country = String::from("Austria");
+    adds_hungary2(country);
+    //adds_hungary2(country); second time does not work country is dead
+    
+    let country = String::from("Kiribati");
+    prints_country_3(country.clone());
+    prints_country_3(country);
+    
+    let mut my_string = String::new();
+    for _ in 0..50 {
+        my_string.push_str("Here are some more words ");
+        //get_length(my_string.clone());
+        get_length2(&my_string);
+    }
+    
+    let my_number;
+    {
+        let calculation_result = {
+            57
+        };
+        my_number = calculation_result;
+        println!("{my_number}");
+    }
+    
+    println!(r#"He said, "You can find the file at
+c:\files\my_documents\file.txt." Then I found the file."#);
+
+    println!("{:X}", '행' as u32);
+    println!("{:X}", 'H' as u32);
+    println!("{:X}", '居' as u32);
+    println!("{:X}", 'い' as u32);
+    println!("\u{D589}, \u{48}, \u{5C45}, \u{3044}");
+    
+    let number = 9;
+    let number_ref = &number;
+    println!("{:p}", number_ref);
+    
+    let number = 555;
+    println!("Binary: {:b}, hexadecimal: {:x}, octal: {:o}", number, number,
+    number);
+}
+fn get_length2(input: &String) {
+    println!("It's {} words long.", input.split_whitespace().count());
+}
+fn get_length(input: String) {
+    println!("It's {} words long.",
+    input.split_whitespace().count());
 }
