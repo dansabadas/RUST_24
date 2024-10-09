@@ -1,2 +1,2 @@
-vscode/hello_world/target/
-vscode/hello_world/Cargo.lock
+**/Cargo.lock
+**/target/
