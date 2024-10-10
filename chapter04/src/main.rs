@@ -54,6 +54,52 @@ enum Number {
     U32(u32),
     I32(i32),
 }
+#[derive(Debug)]
+enum AnimalType {
+    Cat,
+    Dog,
+}
+#[derive(Debug)]
+struct Animal {
+    age: u8,
+    animal_type: AnimalType,
+}
+impl Animal {
+    fn new_cat() -> Self {
+        Self {
+            age: 10,
+            animal_type: AnimalType::Cat,
+        }
+    }
+    fn check_type(&self) {
+        match self.animal_type {
+            AnimalType::Dog => println!("The animal is a dog"),
+            AnimalType::Cat => println!("The animal is a cat"),
+        }
+    }
+    fn change_to_dog(&mut self) {
+        self.animal_type = AnimalType::Dog;
+        println!("Changed animal to dog! Now it's {self:?}");
+    }
+    fn change_to_cat(&mut self) {
+        self.animal_type = AnimalType::Cat;
+        println!("Changed animal to cat! Now it's {self:?}");
+    }
+}
+enum Mood2 {
+    Good,
+    Bad,
+    Sleepy,
+}
+impl Mood2 {
+    fn check(&self) {
+        match self {
+            Mood2::Good => println!("Feeling good!"),
+            Mood2::Bad => println!("Eh, not feeling so good"),
+            Mood2::Sleepy => println!("Need sleep NOW"),
+        }
+    }
+}
 fn main() {
     let my_color = ColorRgb(50, 0, 50);
     println!("The second part of the color is: {}", my_color.1);
@@ -120,6 +166,104 @@ fn main() {
             Number::I32(number) => println!("An i32 with the value {number}"),
         }
     }
+
+    let mut my_string = String::from("I feel excited");
+    my_string.push('!');
+
+    let mut new_animal = Animal::new_cat();
+    new_animal.check_type();
+    new_animal.change_to_dog();
+    new_animal.check_type();
+    new_animal.change_to_cat();
+    new_animal.check_type();
+
+    let my_mood = Mood2::Sleepy;
+    my_mood.check();
+
+    let papa_doc = Person {
+        name: "Papa Doc".to_string(),
+        real_name: "Clarence".to_string(),
+        height: 170,
+        happiness: false
+    };
+    // let Person {
+    //     name,
+    //     real_name,
+    //     height,
+    //     happiness,
+    // } = papa_doc;
+    let Person {
+        name: fake_name,
+        real_name,
+        height: cm,
+        happiness
+        } = papa_doc;
+
+    // println!("They call him {name} but his real name is {real_name}.
+    // He is {height} cm tall and is he happy? {happiness}");
+    println!("They call him {fake_name} but his real name is {real_name}. He is {cm} cm tall and is he happy? {happiness}");
+
+    let tallinn = City::new("Tallinn", "Reval", 426_538, 1219);
+    tallinn.print_names();
+
+    let papa_doc3 = Person3 {
+        name: "Papa Doc".to_string(),
+        real_name: "Clarence".to_string(),
+        height: 170,
+        happiness: false,
+    };
+    check_if_happy(&papa_doc3);
+    check_if_happy_destructured(&papa_doc3);
+
+}
+struct City {
+    name: String,
+    name_before: String,
+    population: u32,
+    date_founded: u32,
+}
+impl City {
+    fn new(
+        name: &str,
+        name_before: &str,
+        population: u32,
+        date_founded: u32,
+    ) -> Self {
+        Self {
+            name: String::from(name),
+            name_before: String::from(name_before),
+            population,
+            date_founded,
+        }
+    }
+    fn print_names(&self) {
+        let City {
+            name,
+            name_before,
+            ..
+            // population,
+            // date_founded,
+        } = self;
+        println!("The city {name} used to be called {name_before}.");
+    }
+}
+struct Person3 {
+    name: String,
+    real_name: String,
+    height: u8,
+    happiness: bool,
+}
+fn check_if_happy(person: &Person3) {
+    println!("Is {} happy? {}", person.name, person.happiness);
+}
+fn check_if_happy_destructured(Person3 { name, happiness, .. }: &Person3) {
+    println!("Is {name} happy? {happiness}");
+}
+struct Person {
+    name: String,
+    real_name: String,
+    height: u8,
+    happiness: bool
 }
 
 fn get_number(input: i32) -> Number {
