@@ -215,6 +215,19 @@ fn main() {
     check_if_happy(&papa_doc3);
     check_if_happy_destructured(&papa_doc3);
 
+    let my_number = 9;
+    let reference = &my_number;
+
+    println!("{}", my_number == *reference);
+
+    let my_name = "Billy".to_string();
+    let double_ref = &&my_name;
+    println!("{}", my_name);
+    println!("{}", double_ref.is_empty());
+    println!("{}", (&**double_ref).is_empty());
+    println!("{}", (**double_ref));
+    println!("{}", &&&&&double_ref.is_empty());
+    println!("{}", &&&&&double_ref);
 }
 struct City {
     name: String,
