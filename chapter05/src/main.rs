@@ -72,6 +72,46 @@ fn main() {
     let error_value: Result<i32, &str> = Err("There was an error");
     let unwrapped = ok_value.unwrap();
     //error_value.unwrap();//panic here
+
+    let my_vec = vec![2, 3, 4];
+    let get_one = my_vec.get(0);
+    let get_two = my_vec.get(10);
+    println!("{:?}", get_one);
+    println!("{:?}", get_two);
+
+    for index in 0..10 {
+        match my_vec.get(index) {
+            Some(number) => println!("The number is: {number}"),
+            None => {}
+        }
+    }
+
+    for index in 0..10 {
+        if let Some(number) = my_vec.get(index) {
+            println!("The number is: {number}");
+        }
+    }
+
+    for index in 0..10 {
+        let Some(number) = my_vec.get(index) else {
+            println!("Index is: {index}");
+            continue;
+        };
+        println!("The number is: {number}");
+    }
+
+    let weather_vec = vec![
+        vec!["Berlin", "cloudy", "5", "-7", "78"],
+        vec!["Athens", "sunny", "not humid", "20", "10", "50"],
+    ];
+    for mut city in weather_vec {
+        println!("For the city of {}:", city[0]);
+        while let Some(information) = city.pop() {
+            if let Ok(number) = information.parse::<i32>() {
+                println!("The number is: {number}");
+            }
+        }
+    }
 }
 
 fn check_if_five(number: i32) -> Result<i32, String> {
