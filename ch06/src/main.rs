@@ -58,4 +58,76 @@ fn main() {
     book_hashmap.insert(1, "섀도우 오브 유어 스마일");
     book_hashmap.insert(1, "Eye of the World");
     println!("{:?}", book_hashmap.get(&1));
+    let key = 1;
+    match book_hashmap.get(&key) {
+        Some(val) => println!("Key {key} has a value already: {val}"),
+        None => {
+            book_hashmap.insert(key, "Le Petit Prince");
+        }
+    }
+    println!("{:?}", book_hashmap.get(&1));
+
+    let mut book_hashmap2 = HashMap::new();
+    let mut old_hashmap_values = Vec::new();
+    let hashmap_entries = [
+        (1, "L'Allemagne Moderne"),
+        (1, "Le Petit Prince"),
+        (1, "섀도우 오브 유어 스마일"),
+        (1, "Eye of the World"),
+    ];
+
+    for (key, value) in hashmap_entries {
+        if let Some(old_value) = book_hashmap2.insert(key, value) {//insert returns old value being replaced
+            println!("Overwriting {old_value} with {value}!");
+            old_hashmap_values.push(old_value);
+        }
+    }
+
+    println!("All old values: {old_hashmap_values:?}");
+
+    let book_collection = vec![
+        "L'Allemagne Moderne",
+        "Le Petit Prince",
+        "Eye of the World",
+        "Eye of the World",
+    ];
+    let mut book_hashmap = HashMap::new();
+    for book in book_collection {
+        book_hashmap.entry(book).or_insert(true);
+    }
+    for (book, true_or_false) in book_hashmap {
+        println!("Do we have {book}? {true_or_false}");
+    }
+
+    let book_collection = vec![
+        "L'Allemagne Moderne",
+        "Le Petit Prince",
+        "Eye of the World",
+        "Eye of the World",
+    ];
+
+    let mut book_hashmap3 = HashMap::new();
+    for book in book_collection {
+        let return_value = book_hashmap3.entry(book).or_insert(0);
+        *return_value += 1;
+    }
+    for (book, number) in book_hashmap3 {
+        println!("{book}, {number}");
+    }
+
+    let data = vec![
+        ("male", 9),
+        ("female", 5),
+        ("male", 0),
+        ("female", 6),
+        ("female", 5),
+        ("male", 10),
+    ];
+    let mut survey_hash = HashMap::new();
+    for item in data {
+        survey_hash.entry(item.0).or_insert(Vec::new()).push(item.1);
+    }
+    for (male_or_female, numbers) in survey_hash {
+        println!("{male_or_female}: {numbers:?}");
+    }
 }
