@@ -1,3 +1,6 @@
+use std::{fmt::Display, sync::{Arc, Mutex}};
+use std::thread::spawn;
+
 fn main() {
     let some_vec = vec![9, 8, 10];
     do_something(|| {
@@ -77,6 +80,154 @@ fn main() {
         "Years left are {:?}\nPopulations left are {:?}",
         tallinn.years, tallinn.populations
     );
+
+    print_maximum(8, 10);
+    print_maximum2(8, 10);
+
+    let name = "Tuon";
+    let string_name = String::from("Tuon");
+    prints_it(name);
+    prints_it(string_name);
+
+    prints_it_regular_generic::<u8>(100);
+    prints_it_impl_trait(100);
+    prints_it_impl_trait(100u8);
+    // prints_it_impl_trait::<u8>(100);
+
+    let my_number = 10;
+    let mut doubles = returns_a_closure("double");
+    let mut triples = returns_a_closure("triple");
+    let mut does_nothing = returns_a_closure("HI");
+    let doubled = doubles(my_number);
+    let tripled = triples(my_number);
+    let same = does_nothing(my_number);
+
+    let handle = std::thread::spawn(|| {
+        println!("The thread is working!")
+    });
+    handle.join().unwrap();
+
+    let handle = std::thread::spawn(|| {
+        for _ in 0..5 {
+            println!("The thread is working!")
+        }
+    });
+    handle.join().unwrap();
+
+    let thread1 = std::thread::spawn(|| {
+        for _ in 0..5 {
+            println!("Thread 1 is working!")
+        }
+    });
+    let thread2 = std::thread::spawn(|| {
+        for _ in 0..5 {
+            println!("Thread 2 is working!")
+        }
+    });
+
+    thread1.join().unwrap();
+    thread2.join().unwrap();
+
+    let my_number = Arc::new(Mutex::new(0));
+    let cloned_1 = Arc::clone(&my_number);
+    let cloned_2 = Arc::clone(&my_number);
+    let thread1 = std::thread::spawn(move || {
+        for _ in 0..10 {
+            *cloned_1.lock().unwrap() += 1;
+        }
+    });
+    let thread2 = std::thread::spawn(move || {
+        for _ in 0..10 {
+            *cloned_2.lock().unwrap() += 1;
+        }
+    });
+
+    thread1.join().unwrap();
+    thread2.join().unwrap();
+    println!("Value is: {my_number:?}");
+
+    let my_number = Arc::new(Mutex::new(0));
+    let mut handle_vec = vec![];
+    for _ in 0..10 {
+        let my_number_clone = Arc::clone(&my_number);
+        let handle = std::thread::spawn(move || {
+        for _ in 0..10 {
+            *my_number_clone.lock().unwrap() += 1;
+        }
+        });
+        handle_vec.push(handle);
+    }
+    handle_vec.into_iter().for_each(|handle| handle.join().unwrap());
+    println!("{my_number:?}");
+
+    let mut handle_vec = vec![];
+    let my_number = make_arc(0);
+    for _ in 0..10 {
+        let my_number_clone = new_clone(&my_number);
+        let handle = spawn(move || {
+            for _ in 0..10 {
+                let mut value_inside = my_number_clone.lock().unwrap();
+                *value_inside += 1;
+            }
+        });
+        handle_vec.push(handle);
+    }
+    handle_vec.into_iter().for_each(|handle| handle.join().unwrap());
+    println!("{my_number:?}");
+
+    println!("Exiting the program");
+}
+
+fn make_arc(number: i32) -> Arc<Mutex<i32>> {
+    Arc::new(Mutex::new(number))
+}
+
+fn new_clone(input: &Arc<Mutex<i32>>) -> Arc<Mutex<i32>> {
+    Arc::clone(&input)
+}
+
+fn returns_a_closure(input: &str) -> impl FnMut(i32) -> i32 {
+    match input {
+        "double" => |mut number| {
+            number *= 2;
+            println!("Doubling number. Now it is {number}");
+            number
+        },
+        "triple" => |mut number| {
+            number *= 3;
+            println!("Tripling number. Now it is {number}");
+            number
+        },
+        _ => |number| {
+            println!("Sorry, it's the same: {number}.");
+            number
+        },
+    }
+}
+fn gives_higher2(one: impl PartialOrd + Display, two: impl PartialOrd + Display) {
+    // let higher = if one > two { one } else { two };
+    // println!("{higher} is higher.");
+}
+
+fn prints_it_impl_trait(input: impl Display) {
+    println!("You can print many things, including {input}");
+}
+fn prints_it_regular_generic<T: Display>(input: T) {
+    println!("You can print many things, including {input}");
+}
+
+fn prints_it(input: impl Into<String> + Display) {
+    println!("You can print many things, including {input}");
+}
+
+fn print_maximum2<T: PartialOrd + Display>(one: T, two: T) {
+    let higher = if one > two { one } else { two };
+    println!("{higher} is higher.");
+}
+
+fn print_maximum(one: i32, two: i32) {
+    let higher = if one > two { one } else { two };
+    println!("{higher} is higher");
 }
 
 #[derive(Debug)]
