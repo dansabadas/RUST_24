@@ -1,5 +1,7 @@
 use std::{fmt::Display, sync::{Arc, Mutex}};
 use std::thread::spawn;
+use std::thread;
+use std::sync::mpsc::channel;
 
 fn main() {
     let some_vec = vec![9, 8, 10];
@@ -174,6 +176,91 @@ fn main() {
     }
     handle_vec.into_iter().for_each(|handle| handle.join().unwrap());
     println!("{my_number:?}");
+
+    let my_number = Mutex::new(0);
+    thread::scope(|s| {
+        s.spawn(|| {
+            for _ in 0..10 {
+                *my_number.lock().unwrap() += 1;
+            }
+        });
+        s.spawn(|| {
+            for _ in 0..10 {
+                *my_number.lock().unwrap() += 1;
+            }
+        });
+    });
+    println!("{my_number:?}");
+
+    let mutex_number = Mutex::new(0);
+    let mut regular_mut_number = 0;
+    let regular_unmut_number = 0;
+    thread::scope(|s| {
+        s.spawn(|| {
+            for _ in 0..3 {
+                *mutex_number.lock().unwrap() += 1;
+                regular_mut_number += 1;
+                println!("Multiple immutable borrows is fine!
+                {regular_unmut_number}");
+            }
+        });
+        s.spawn(|| {
+            for _ in 0..3 {
+                *mutex_number.lock().unwrap() += 1;
+                // regular_mut_number += 1;
+                println!("Borrowing {regular_unmut_number} here too, it's just fine!");
+            }
+        });
+    });
+    println!("mutex_number: {mutex_number:?}");
+    println!("regular_mut_number: {regular_mut_number}");
+
+    thread::scope(|s| {
+        for thread_number in 0..1000 {
+            s.spawn(move|| {
+                println!("Thread number {thread_number}");
+            });
+        };
+    });
+
+    //let (sender, receiver) = channel();
+
+    let (sender, receiver) = channel();
+    sender.send(5);
+    receiver.recv();
+
+    let (sender, receiver) = channel();
+    sender.send(5).unwrap();
+    println!("{}", receiver.recv().unwrap());
+
+    let (sender, receiver) = channel();
+    let sender_clone = sender.clone();
+    let jh = std::thread::spawn(move || {
+        sender.send("Send a &str this time").unwrap();
+        sender.send("Send a &str this time").unwrap();
+    });
+    std::thread::spawn(move || {
+        sender_clone.send("And here is another &str").unwrap();
+        sender_clone.send("And here is another &str").unwrap();
+    });
+    while let Ok(res) = receiver.recv() {
+        println!("{res}");
+    }
+
+    let (sender, receiver) = channel();
+    drop(receiver);
+    if let Err(e) = sender.send(5) {
+        println!("Got an error: {e}")
+    }
+
+    let (sender, receiver) = channel();
+    sender.send(5).unwrap();
+    sender.send(5).unwrap();
+    drop(sender);
+
+    println!("{:?}", receiver.recv());
+    println!("{:?}", receiver.recv());
+    println!("{:?}", receiver.recv());
 
     println!("Exiting the program");
 }
