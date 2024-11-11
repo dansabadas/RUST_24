@@ -1,7 +1,8 @@
 use serde::{Serialize, Deserialize};
 use serde_json;
 
-use std::time::Instant;
+use std::time::{Instant, SystemTime, UNIX_EPOCH, Duration};
+use std::thread::sleep;
 
 fn main() {
     let good_json_request = r#"
@@ -33,10 +34,56 @@ fn main() {
             break;
         }
     }
-    
+
     let after_operation = Instant::now();
     println!("{:?}", before_operation - start_of_main);
     println!("{:?}", after_operation - start_of_main);
+
+    let start = Instant::now();
+    println!("Time elapsed before busy operation: {:?}", start.elapsed());
+    let mut new_string = String::new();
+    loop {
+        new_string.push('წ');
+        if new_string.len() > 100_000 {
+            break;
+        }
+    }
+    println!("Operation complete. Time elapsed: {:?}", start.elapsed());
+
+    bad_random_number(1);
+    bad_random_number(1);
+    bad_random_number(3);
+    bad_random_number(3);
+
+    bad_random_number(9);
+    bad_random_number(9);
+    bad_random_number(9);
+
+    let instant = Instant::now();
+    let system_time = SystemTime::now();
+    println!("{instant:?}");
+    println!("{system_time:?}");
+
+    println!("{:?}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap());
+
+    let three_seconds = Duration::from_secs(1);
+    println!("I must sleep now.");
+    sleep(three_seconds);
+    println!("Did I miss anything?");
+}
+
+fn bad_random_number(digits: usize) {
+    if digits > 9 {
+        panic!("Random number can only be up to 9 digits");
+    }
+    let now_as_string = format!("{:?}", Instant::now());
+    now_as_string
+        .chars()
+        .rev()
+        .filter_map(|c| c.to_digit(10))
+        .take(digits)
+        .for_each(|character| print!("{}", character));
+    println!();
 }
 
 #[derive(Debug, Serialize, Deserialize)]
