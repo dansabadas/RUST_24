@@ -1,5 +1,13 @@
+//#![no_implicit_prelude]
+//extern crate std;
+
 use std::mem;
 use std::time::Duration;
+use std::convert::From;
+use rand::{thread_rng, Rng};
+
+use std::cell::RefCell;
+use std::sync::Mutex;
 
 fn main() {
     println!("Size of an i32: {}", mem::size_of::<i32>());
@@ -71,8 +79,73 @@ fn main() {
             println!("No payload!");
         }
     }));
-    panic!("Oh no");
-    panic!();
+    //panic!("Oh no");
+    //panic!();
+}
+
+lazy_static::lazy_static! {
+    static ref INITIAL_VALUE: Mutex<i32> = Mutex::new(10);
+}
+
+thread_local! {
+    static LOCAL_INITIAL_VALUE: RefCell<i32> = RefCell::new(10);
+}
+
+#[test]
+fn one() {
+    let mut lock = INITIAL_VALUE.lock().unwrap();
+    println!("Test 1. Global value is {lock}");
+    *lock += 1;
+    println!("Test 1. Global value is now {lock}");
+    LOCAL_INITIAL_VALUE.with(|cell| {
+        let mut lock = cell.borrow_mut();
+        println!("Test 1. Local value is {lock:?}");
+        *lock += 1;
+        println!("Test 1. Local value is now {lock:?}\n");
+    });
+}
+
+#[test]
+fn two() {
+    let mut lock = INITIAL_VALUE.lock().unwrap();
+    println!("Test 2. Global value is {lock}");
+    *lock += 1;
+    println!("Test 2. Global value is now {lock}");
+    LOCAL_INITIAL_VALUE.with(|cell| {
+        let mut lock = cell.borrow_mut();
+        println!("Test 2. Local value is {lock:?}");
+        *lock += 1;
+        println!("Test 2. Local value is now {lock:?}\n");
+    });
+}
+
+#[test]
+fn three() {
+    let mut lock = INITIAL_VALUE.lock().unwrap();
+    println!("Test 3. Global value is {lock}");
+    *lock += 1;
+    println!("Test 3. Global value is now {lock}");
+    LOCAL_INITIAL_VALUE.with(|cell| {
+        let mut lock = cell.borrow_mut();
+        println!("Test 3. Local value is {lock:?}");
+        *lock += 1;
+        println!("Test 3. Local value is now {lock:?}\n");
+    });
+}
+
+fn human_readable_rand_num() -> &'static str {
+    match zero_to_three() {
+        0 => "zero",
+        1 => "one",
+        2 => "two",
+        3 => "three",
+        _ => unreachable!(),
+    }
+}
+
+fn zero_to_three() -> usize {
+    let mut rng = thread_rng();
+    rng.gen_range(0..=3)
 }
 
 struct UserState {
