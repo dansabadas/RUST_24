@@ -109,4 +109,6 @@ fn main() {
     print_it();
     make_a_function!(say_its_nice, this, is, really, nice);
     say_its_nice();
+
+    dbg!(vec![8, 9, 10]);
 }
