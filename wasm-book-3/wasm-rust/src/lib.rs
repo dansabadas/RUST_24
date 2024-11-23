@@ -58,20 +58,6 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
-                // let next_cell = match (cell, live_neighbors) {
-                //     // Rule 1: Any live cell with fewer than two live neighbours dies by underpopulation.
-                //     (Cell::Alive, x) if x < 2 => Cell::Dead,
-                //     // Rule 2: Any live cell with two or three live neighbours lives.
-                //     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                //     // Rule 3: Any live cell with more than three live neighbours dies by overpopulation.
-                //     (Cell::Alive, x) if x > 3 => Cell::Dead,
-                //     // Rule 4: Any dead cell with exactly three live neighbours becomes alive cell by reproduction.
-                //     (Cell::Dead, 3) => Cell::Alive,
-                //     // All other cells remain in the same state.
-                //     (otherwise, _) => otherwise,
-                // };
-            //    next[idx] = next_cell;
-
                 next.set(idx, match (cell, live_neighbors) { 
                     (true, x) if x < 2 => false,
                     (true, 2) | (true, 3) => true,
@@ -93,23 +79,8 @@ impl Universe {
         let size = (width * height) as usize;
         let mut cells = FixedBitSet::with_capacity(size);
         for i in 0..size {
-            cells.set(i, js_sys::Math::random() > 0.5);//i % 2 == 0 || i % 7 == 0 //js_sys::Math::random() > 0.5
+            cells.set(i, js_sys::Math::random() > 0.5);
         }
-
-        // let cells = (0..width * height)
-        //     .map(|i| {
-        //         if js_sys::Math::random() < 0.5 {
-        //             Cell::Alive
-        //         } else {
-        //             Cell::Dead
-        //         }
-        //         // if i % 2 == 0 || i % 7 == 0 {
-        //         //     Cell::Alive
-        //         // } else {
-        //         //     Cell::Dead
-        //         // }
-        //     })
-        //     .collect();
 
         Universe {
             width,
@@ -130,11 +101,26 @@ impl Universe {
         self.height
     }
 
-    // pub fn cells(&self) -> *const Cell {
-    //     self.cells.as_ptr()
-    // }
     pub fn cells(&self) -> *const usize {
         self.cells.as_slice().as_ptr()
+    }
+
+    /// Set the width of the universe.
+    ///
+    /// Resets all cells to the dead state.
+    pub fn set_width(&mut self, width: u32) {
+        self.width = width;
+        self.cells = FixedBitSet::with_capacity((width * self.height) as usize);
+        self.cells.clear();
+    }
+
+    /// Set the height of the universe.
+    ///
+    /// Resets all cells to the dead state.
+    pub fn set_height(&mut self, height: u32) {
+        self.height = height;
+        self.cells = FixedBitSet::with_capacity((self.width * height) as usize);
+        self.cells.clear();
     }
 }
 
