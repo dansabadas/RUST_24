@@ -30,8 +30,8 @@
 
         const CELL_SIZE = 5; // px
         const GRID_COLOR = "#CCCCCC";
-        const DEAD_COLOR = "#FFFFFF";
-        const ALIVE_COLOR = "#000000";
+        const DEAD_COLOR = "#000000";
+        const ALIVE_COLOR = "#FFFFFF";//FFFFFF 000000
 
         async function loadWasm() {
             try {
@@ -80,9 +80,16 @@
                     return row * width + column;
                 };
                   
+                const bitIsSet = (n, arr) => {
+                    const byte = Math.floor(n / 8);
+                    const mask = 1 << (n % 8);
+                    return (arr[byte] & mask) === mask;
+                };
+
                 const drawCells = () => {
                     const cellsPtr = universe.cells();
-                    const cells = new Uint8Array(wasm.memory.buffer, cellsPtr, width * height);
+                    //const cells = new Uint8Array(wasm.memory.buffer, cellsPtr, width * height);
+                    const cells = new Uint8Array(wasm.memory.buffer, cellsPtr, width * height / 8);
                   
                     ctx.beginPath();
                   
@@ -90,7 +97,7 @@
                       for (let col = 0; col < width; col++) {
                         const idx = getIndex(row, col);
                   
-                        ctx.fillStyle = cells[idx] === Cell.Dead
+                        ctx.fillStyle = bitIsSet(idx, cells) //cells[idx] === Cell.Dead
                           ? DEAD_COLOR
                           : ALIVE_COLOR;
                   
