@@ -27,8 +27,9 @@ fn main() {
     //println!("{:?}", status);
 
     assert_eq!("abcdefg", reverse(String::from("gfedcba")));
+    let str1 = "abcdefg".to_string();
     assert_eq!(
-        reverse_and_uppercase("abcdefg".to_string()),
+        reverse_and_uppercase(str1),
         ("gfedcba".to_string(), "GFEDCBA".to_string())
     );
     assert_eq!("abcdefg", reverse2("gfedcba"));
@@ -36,6 +37,7 @@ fn main() {
     let mut abcdefg = String::from("gfedcba");
     reverse_inplace(&mut abcdefg);
     assert_eq!("abcdefg", abcdefg);
+    //println!("{:?}", str1);
 }
 
 fn reverse_inplace(s: &mut String) {
