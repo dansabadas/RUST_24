@@ -2,6 +2,10 @@ use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::path::Path;
 
+use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
+use static_init::dynamic;
+
 fn main() {
     let outer = Arc::new(
         (Mutex::new(0), Condvar::new())
@@ -73,6 +77,61 @@ fn main() {
         "first_line: {:?}",
         err
     );
+
+    let arc = POPULAR_BABY_NAMES_2021.with(|arc| arc.clone());
+    let mut inner = arc.lock().expect("unable to lock mutex");
+    *inner = Some(vec![
+        String::from("Olivia"),
+        String::from("Liam"),
+        String::from("Emma"),
+        String::from("Noah"),
+    ]);
+    println!("popular baby names of 2020: {:?}", *POPULAR_BABY_NAMES_2020);
+    println!("popular baby names of 2019: {:?}", *POPULAR_BABY_NAMES_2019);
+    println!("popular baby names of 2018: {:?}", *POPULAR_BABY_NAMES_2018);
+
+    let popular_baby_names_2017: std::cell::OnceCell<Vec<String>> = std::cell::OnceCell::new();
+    popular_baby_names_2017.get_or_init(|| {
+        vec![
+            String::from("Emma"),
+            String::from("Liam"),
+            String::from("Olivia"),
+            String::from("Noah"),
+        ]
+    });
+    println!("popular baby names of 2017: {:?}", popular_baby_names_2017.get());
+}
+
+#[dynamic]
+static POPULAR_BABY_NAMES_2018: Vec<String> = vec![
+    String::from("Emma"),
+    String::from("Liam"),
+    String::from("Olivia"),
+    String::from("Noah"),
+];
+
+static POPULAR_BABY_NAMES_2019: Lazy<Vec<String>> = Lazy::new(|| {
+    vec![
+    String::from("Olivia"),
+    String::from("Liam"),
+    String::from("Emma"),
+    String::from("Noah"),
+    ]
+});
+
+lazy_static! {
+    static ref POPULAR_BABY_NAMES_2020: Vec<String> = {
+        vec![
+            String::from("Olivia"),
+            String::from("Liam"),
+            String::from("Emma"),
+            String::from("Noah"),
+        ]
+    };
+}
+
+thread_local! {
+    static POPULAR_BABY_NAMES_2021: Arc<Mutex<Option<Vec<String>>>> = Arc::new(Mutex::new(None));
 }
 
 #[cfg(test)]
