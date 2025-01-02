@@ -1,3 +1,5 @@
+use std::thread;
+
 fn main() {
     macro_rules! print_what_it_is {
         () => {
@@ -71,6 +73,12 @@ fn main() {
     get_name_from_first(&container);
     get_name_from_second(&container);
 
+    let builder = thread::Builder::new().stack_size(4 * 1024 * 1024); // 4 MB stack
+    let handler = builder.spawn(|| {
+        // Thread logic
+    }).unwrap();
+
+    handler.join().unwrap();
 }
 
 struct Container {
