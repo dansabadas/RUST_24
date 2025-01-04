@@ -80,28 +80,46 @@ fn main() {
 
     handler.join().unwrap();
 
-    let mut bicycle_builder = BicycleBuilder::new();
-    bicycle_builder.with_make("Huffy");
-    bicycle_builder.with_model("Radio");
-    bicycle_builder.with_size(46);
-    bicycle_builder.with_color("red");
-    let bicycle = bicycle_builder.build();
-    println!("My new bike: {:#?}", bicycle);
+    // let mut bicycle_builder = BicycleBuilder::new();
+    // bicycle_builder.with_make("Huffy");
+    // bicycle_builder.with_model("Radio");
+    // bicycle_builder.with_size(46);
+    // bicycle_builder.with_color("red");
+    // let bicycle = bicycle_builder.build();//was moved cannot be used anymore
+    // println!("My new bike: {:#?}", bicycle);
+
+    let bicycle2 = Bicycle::builder()
+        .with_make("Trek")
+        .with_model("Madone")
+        .with_size(52)
+        .with_color("purple")
+        .build();
+    println!("{:?}", bicycle2);
 }
 
 macro_rules! with_str {
     ($name:ident, $func:ident) => {
-        fn $func(&mut self, $name: &str) {
-            self.bicycle.$name = $name.into()
+        pub fn $func(self, $name: &str) -> Self {
+            Self {
+                bicycle: Bicycle {
+                    $name: $name.into(),
+                    ..self.bicycle
+                },
+            }
         }
     };
 }
 macro_rules! with {
     ($name:ident, $func:ident, $type:ty) => {
-        fn $func(&mut self, $name: $type) {
-            self.bicycle.$name = $name
+        pub fn $func(self, $name: $type) -> Self {
+            Self {
+                bicycle: Bicycle {
+                    $name,
+                    ..self.bicycle
+                },
+            }
         }
-    };
+    };     
 }
 macro_rules! accessor {
     ($name:ident, &$ret:ty) => {
