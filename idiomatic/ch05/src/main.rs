@@ -79,6 +79,123 @@ fn main() {
     }).unwrap();
 
     handler.join().unwrap();
+
+    let mut bicycle_builder = BicycleBuilder::new();
+    bicycle_builder.with_make("Huffy");
+    bicycle_builder.with_model("Radio");
+    bicycle_builder.with_size(46);
+    bicycle_builder.with_color("red");
+    let bicycle = bicycle_builder.build();
+    println!("My new bike: {:#?}", bicycle);
+}
+
+macro_rules! with_str {
+    ($name:ident, $func:ident) => {
+        fn $func(&mut self, $name: &str) {
+            self.bicycle.$name = $name.into()
+        }
+    };
+}
+macro_rules! with {
+    ($name:ident, $func:ident, $type:ty) => {
+        fn $func(&mut self, $name: $type) {
+            self.bicycle.$name = $name
+        }
+    };
+}
+macro_rules! accessor {
+    ($name:ident, &$ret:ty) => {
+        pub fn $name(&self) -> &$ret {
+            &self.$name
+        }
+    };
+    ($name:ident, $ret:ty) => {
+        pub fn $name(&self) -> $ret {
+            self.$name
+        }
+    };
+}
+
+#[derive(Debug)]
+pub struct Bicycle {
+    make: String,
+    model: String,
+    size: i32,
+    color: String,
+}
+
+impl Bicycle {
+    accessor!(make, &String);
+    accessor!(model, &String);
+    accessor!(size, i32);
+    accessor!(color, &String);
+    // fn make(&self) -> &String {
+    //     &self.make
+    // }
+    // fn model(&self) -> &String {
+    //     &self.model
+    // }
+    // fn size(&self) -> i32 {
+    //     self.size
+    // }
+    // fn color(&self) -> &String {
+    //     &self.color
+    // }
+}
+
+pub trait Builder<T> {
+    fn new() -> Self;
+    fn build(self) -> T;
+}
+
+trait Buildable<Target, B: Builder<Target>> {
+    fn builder() -> B;
+}
+
+pub struct BicycleBuilder {
+    bicycle: Bicycle,
+}
+
+impl BicycleBuilder {
+    // fn with_make(&mut self, make: &str) {
+    //     self.bicycle.make = make.into()
+    // }
+    // fn with_model(&mut self, model: &str) {
+    //     self.bicycle.model = model.into()
+    // }
+    // fn with_size(&mut self, size: i32) {
+    //     self.bicycle.size = size
+    // }
+    // fn with_color(&mut self, color: &str) {
+    //     self.bicycle.color = color.into()
+    // }
+    with_str!(make, with_make);
+    with_str!(model, with_model);
+    with!(size, with_size, i32);
+    with_str!(color, with_color);
+}
+
+impl Builder<Bicycle> for BicycleBuilder {
+    fn new() -> Self {
+        Self {
+            bicycle: Bicycle {
+                make: String::new(),
+                model: String::new(),
+                size: 0,
+                color: String::new(),
+            },
+        }
+    }
+
+    fn build(self) -> Bicycle {
+        self.bicycle
+    }
+}    
+
+impl Buildable<Bicycle, BicycleBuilder> for Bicycle {
+    fn builder() -> BicycleBuilder {
+        BicycleBuilder::new()
+    }
 }
 
 struct Container {
