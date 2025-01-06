@@ -1,4 +1,7 @@
+use std::cell::RefCell;
 use std::thread;
+//use std::rc::Weak;// 
+use std::sync::{Arc, Weak};
 
 fn main() {
     macro_rules! print_what_it_is {
@@ -95,6 +98,149 @@ fn main() {
         .with_color("purple")
         .build();
     println!("{:?}", bicycle2);
+
+    let my_callback = || println!("I have been called back");
+    callback_fn(my_callback);
+//////////////////////////////
+    // Create an Arc to manage shared data
+    let data = Arc::new(42);
+
+    // Downgrade the Arc to a Weak reference
+    let weak_data: Weak<i32> = Arc::downgrade(&data);
+
+    // Upgrade the Weak reference back to an Arc
+    if let Some(upgraded_data) = weak_data.upgrade() {
+        println!("Upgraded value: {}", upgraded_data);
+    } else {
+        println!("The value has been dropped.");
+    }
+
+    // Drop the original Arc
+    drop(data);
+
+    // Try upgrading again after the Arc is dropped
+    if let Some(upgraded_data) = weak_data.upgrade() {
+        println!("Upgraded value: {}", upgraded_data);
+    } else {
+        println!("The value has been dropped."); // This will execute
+    }
+//////////////////////////////
+    // Create a parent node
+    let parent = Arc::new(Node {
+        value: 10,
+        parent: RefCell::new(Weak::new()), // Initially no parent
+    });
+
+    // Create a child node with a reference to the parent
+    let child = Arc::new(Node {
+        value: 20,
+        parent: RefCell::new(Arc::downgrade(&parent)), // Downgrade to a Weak reference
+    });
+
+    // Upgrade the weak reference from the child to access the parent
+    if let Some(parent_ref) = child.parent.borrow().upgrade() {
+        println!("Child's parent value: {}", parent_ref.value);
+    } else {
+        println!("Parent has been dropped.");
+    }
+
+    // Drop the parent node
+    drop(parent);
+
+    // Try upgrading again
+    if let Some(parent_ref) = child.parent.borrow().upgrade() {
+        println!("Child's parent value: {}", parent_ref.value);
+    } else {
+        println!("Parent has been dropped."); // This will execute
+    };
+
+    let mut subject = Subject::new("some subject state");
+    let observer1 = MyObserver::new("observer1");
+    let observer2 = MyObserver::new("observer2");
+    subject.attach(observer1.clone());
+    subject.attach(observer2.clone());
+    // ... do something here ...
+    subject.update();
+}
+
+struct Node {
+    value: i32,
+    parent: RefCell<Weak<Node>>, // Weak reference to avoid circular dependency
+}
+
+pub trait Observer {
+    type Subject;
+    fn observe(&self, subject: &Self::Subject);
+}
+
+pub trait Observable {
+    type Observer;
+    fn update(&self);
+    fn attach(&mut self, observer: Self::Observer);
+    fn detach(&mut self, observer: Self::Observer);
+}
+
+pub struct Subject {
+    observers: Vec<Weak<dyn Observer<Subject = Self>>>,
+    state: String,
+}
+
+impl Subject {
+    pub fn new(state: &str) -> Self {
+        Self {
+            observers: vec![],
+            state: state.into(),
+        }
+    }
+    
+    pub fn state(&self) -> &str {
+        self.state.as_ref()
+    }
+}
+
+impl Observable for Subject {
+    type Observer = Arc<dyn Observer<Subject = Self>>;
+    fn update(&self) {
+        self.observers
+            .iter()
+            .flat_map(|o| o.upgrade())
+            .for_each(|o| o.observe(self));
+    }
+    fn attach(&mut self, observer: Self::Observer) {
+        self.observers.push(Arc::downgrade(&observer));
+    }
+    fn detach(&mut self, observer: Self::Observer) {
+        self.observers
+            .retain(|f| {
+                !f.ptr_eq(&Arc::downgrade(&observer))
+            });
+    }
+}
+
+struct MyObserver {
+    name: String,
+}
+
+impl MyObserver {
+    fn new(name: &str) -> Arc<Self> {
+        Arc::new(Self { name: name.into() })
+    }
+}
+
+impl Observer for MyObserver {
+    type Subject = Subject;
+    fn observe(&self, subject: &Self::Subject) {
+        println!(
+            "observed subject with state={:?} in {}",
+            subject.state(),
+            self.name
+        );
+    }
+}
+
+fn callback_fn<F>(f: F) where F: Fn() -> (),
+{
+    f();
 }
 
 macro_rules! with_str {
