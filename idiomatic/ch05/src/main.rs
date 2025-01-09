@@ -183,7 +183,57 @@ fn main() -> Result<(), Error> {
         command.execute()?;
     }
 
+    println!("greet: {}", greet("Daniel", "Daniel"));
+    println!("greet: {}", greet("Daniel", "Wen"));
+
+    let bits = BitCount(8);
+    let bytes = ByteCount(12);
+    dbg!(&bits);
+    dbg!(&bytes);
+
+    dbg!(bits.to_bytes());
+    dbg!(bytes.to_bits());
+
+    dbg!(bits.to_bytes().to_bits());
+    dbg!(bytes.to_bits().to_bytes());
+
+    dbg!(bits.0);
+    dbg!(bytes.0);
     Ok(())
+}
+
+#[derive(Debug)]
+struct BitCount(u32);
+
+#[derive(Debug)]
+struct ByteCount(u32);
+
+impl BitCount {
+    fn to_bytes(&self) -> ByteCount {
+        ByteCount(self.0 / 8)
+    }
+}
+
+impl ByteCount {
+    fn to_bits(&self) -> BitCount {
+        BitCount(self.0 * 8)
+    }
+}
+
+
+fn greet(name: &str, owner: &str) -> String {
+    if name == owner {
+        "Hello boss".to_string()
+    }
+    else{
+        "Hello guest".to_string()
+    }
+}
+
+#[test]
+fn test_greet() {
+    assert_eq!(greet("Daniel", "Daniel"), "Hello boss");
+    assert_eq!(greet("Greg", "Daniel"), "Hello guest");
 }
 
 trait Command {
