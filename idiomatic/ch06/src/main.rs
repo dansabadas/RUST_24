@@ -68,6 +68,16 @@ fn main() {
         None => println!("Nothing to greet"),
     }
     println!("Greetings? {:?}", greetings.unwrap());
+    println!("square_sum = {:?}", square_sum(vec![1, 2]));
+}
+
+fn square_sum(vec: Vec<i32>) -> i32 {
+    let mut finalResult = 0;
+    for i in vec {
+        finalResult += i*i;
+    }
+
+    finalResult
 }
 
 struct Point {
@@ -169,6 +179,14 @@ mod tests {
     fn sample_tests() {
         assert_eq!(find_smallest_int(&[34, 15, 88, 2]), 2);
         assert_eq!(find_smallest_int(&[34, -345, -1, 100]), -345);
+    }
+
+        #[test]
+    fn returns_expected() {
+        assert_eq!(square_sum(vec![1, 2]), 5);
+        assert_eq!(square_sum(vec![-1, -2]), 5);
+        assert_eq!(square_sum(vec![5, 3, 4]), 50);
+        assert_eq!(square_sum(vec![]), 0);
     }
 }
 
