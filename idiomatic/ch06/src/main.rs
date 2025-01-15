@@ -69,6 +69,27 @@ fn main() {
     }
     println!("Greetings? {:?}", greetings.unwrap());
     println!("square_sum = {:?}", square_sum(vec![1, 2]));
+    println!("{}", are_you_playing_banjo("rartin"));
+}
+
+fn are_you_playing_banjo(name: &str) -> String {
+    match &name[0..1] {
+        "R" | "r" => format!("{} plays banjo", name),
+        _ => format!("{} does not play banjo", name)
+    }
+}
+
+fn are_you_playing_banjo2(name: &str) -> String {
+    let char = name.chars().nth(0).unwrap();
+    let mut nameString = String::from(name);
+    
+    match char {
+        'R' => nameString.push_str(" plays banjo"),
+        'r' => nameString.push_str(" plays banjo"),
+        _ => nameString.push_str(" does not play banjo"),
+    };
+
+    nameString
 }
 
 fn bool_to_word(value: bool) -> &'static str {
@@ -201,6 +222,14 @@ mod tests {
     fn example_tests() {
         assert_eq!(bool_to_word(true), "Yes");
         assert_eq!(bool_to_word(false), "No");
+    }
+
+    #[test]
+    fn test_are_you_playing_banjo() {
+        assert_eq!(are_you_playing_banjo("Martin"), "Martin does not play banjo");
+        assert_eq!(are_you_playing_banjo("Rikke"), "Rikke plays banjo");
+        assert_eq!(are_you_playing_banjo("bravo"), "bravo does not play banjo");
+        assert_eq!(are_you_playing_banjo("rolf"), "rolf plays banjo");
     }
 }
 
