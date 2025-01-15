@@ -71,6 +71,14 @@ fn main() {
     println!("square_sum = {:?}", square_sum(vec![1, 2]));
 }
 
+fn bool_to_word(value: bool) -> &'static str {
+    let ret = match value {
+        true => "Yes",
+        false => "No"
+    };
+    ret
+}
+
 fn square_sum(vec: Vec<i32>) -> i32 {
     let mut finalResult = 0;
     for i in vec {
@@ -187,6 +195,12 @@ mod tests {
         assert_eq!(square_sum(vec![-1, -2]), 5);
         assert_eq!(square_sum(vec![5, 3, 4]), 50);
         assert_eq!(square_sum(vec![]), 0);
+    }
+
+    #[test]
+    fn example_tests() {
+        assert_eq!(bool_to_word(true), "Yes");
+        assert_eq!(bool_to_word(false), "No");
     }
 }
 
