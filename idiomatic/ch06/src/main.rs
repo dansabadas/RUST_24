@@ -72,6 +72,58 @@ fn main() {
     println!("{}", are_you_playing_banjo("rartin"));
 }
 
+/// Provides a singly linked list implementation with iterator access.
+pub struct LinkedList<T> {
+    head: Option<ListItemPtr<T>>,
+}
+
+impl<T> LinkedList<T> {
+    /// Constructs a new, empty [`LinkedList<T>`].
+    pub fn new() -> Self {
+        Self { head: None }
+    }
+    /// Appends an element to the end of the list. If the list is empty,
+    /// the element becomes the first element of the list.
+    pub fn append(&mut self, t: T) {
+        match &self.head {
+            Some(head) => {
+                let mut next = head.clone();
+                while next.as_ref().borrow().next.is_some() {
+                    let n = next.as_ref()
+                        .borrow().next.as_ref().unwrap().clone();
+                    next = n;
+                }
+                next.as_ref().borrow_mut().next = Some(Rc::new(RefCell::new(ListItem::new(t))));
+            }
+            None => {
+                self.head = Some(Rc::new(RefCell::new(ListItem::new(t))));
+            }
+        }
+    }
+    /// Returns an iterator over the list.
+    pub fn iter(&self) -> Iter<T> {
+        Iter {
+            next: self.head.clone(),
+            data: None,
+            phantom: PhantomData,
+        }
+    }
+    /// Returns an iterator over the list that allows mutation.
+    pub fn iter_mut(&mut self) -> IterMut<T> {
+        IterMut {
+            next: self.head.clone(),
+            data: None,
+            phantom: PhantomData,
+        }
+    }
+    /// Consumes this list returning an iterator over its values.
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter {
+            next: self.head.clone(),
+        }
+    }
+}
+
 fn are_you_playing_banjo(name: &str) -> String {
     match &name[0..1] {
         "R" | "r" => format!("{} plays banjo", name),
