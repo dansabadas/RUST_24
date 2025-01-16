@@ -4,6 +4,33 @@ fn main() {
     dbg!(&buf);
 }
 
+fn positive_sum(slice: &[i32]) -> i32 {
+    //slice.iter().filter(|&&x| x > 0).sum()
+    let mut ret = 0;
+    for &i in slice {
+        if i > 0 {
+            ret += i;
+        }
+    }
+    ret
+}
+
+fn rps(p1: &str, p2: &str) -> &'static str  {
+    if p1 == p2 { return "Draw!"; }
+
+    let p1p2 = (p1, p2);
+    match p1p2 {
+        ("scissors", "paper") => "Player 1 won!",
+        ("rock", "scissors") => "Player 1 won!",
+        ("paper", "rock") => "Player 1 won!",
+        _ => "Player 2 won!"
+    }
+}
+
+fn greet(name: &str) -> String {
+    format!("Hello, {} how are you doing today?", name)
+}
+
 struct Buffer0 {
     buf: [u8; 256],
 }
@@ -26,5 +53,49 @@ struct Buffer<T, const LENGTH: usize> {
 impl<T, const LENGTH: usize> From<[T; LENGTH]> for Buffer<T, LENGTH> {
     fn from(buf: [T; LENGTH]) -> Self {
         Buffer { buf }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn basic_tests() {
+        assert_eq!(greet("Ryan"), "Hello, Ryan how are you doing today?");
+        assert_eq!(
+            greet("Shingles"),
+            "Hello, Shingles how are you doing today?"
+        );
+    }
+
+    const ERR_MSG: &str = "\nYour result (left) did not match the expected output (right)";
+
+    fn dotest(p1: &str, p2: &str, expected: &str) {
+        assert_eq!(rps(p1, p2), expected, "{ERR_MSG} with p1 = \"{p1}\", p2 = \"{p2}\"")   
+    }
+
+    #[test]
+    fn fixed_tests() {
+        dotest("rock", "scissors", "Player 1 won!");
+        dotest("scissors", "rock", "Player 2 won!");
+        dotest("rock", "rock", "Draw!");
+    }
+
+    #[test]
+    fn some_examples() {
+        assert_eq!(positive_sum(&[1,2,3,4,5]), 15);
+        assert_eq!(positive_sum(&[1,-2,3,4,5]), 13);
+        assert_eq!(positive_sum(&[-1,2,3,4,-5]), 9);
+    }
+    
+    #[test]
+    fn empty_list() {
+        assert_eq!(positive_sum(&[]), 0);
+    }
+    
+    #[test]
+    fn all_negative() {
+        assert_eq!(positive_sum(&[-1,-2,-3,-4,-5]), 0);
     }
 }
