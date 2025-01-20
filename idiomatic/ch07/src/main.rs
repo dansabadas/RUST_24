@@ -4,6 +4,33 @@ fn main() {
     dbg!(&buf);
 }
 
+fn string_to_number(s: &str) -> i32 {
+    s.parse::<i32>().unwrap()
+}
+
+fn disemvowel(s: &str) -> String {
+    let mut ret = String::new();
+    for i in s.chars() {
+        // match i {
+        //     'A' | 'a' => {}
+        //     'E' | 'e' => {}
+        //     'I' | 'i' => {}
+        //     'O' | 'o' => {}
+        //     'U' | 'u' => {}
+        //     _ => { ret.push((i)) },
+        // }
+        // if matches!(i, 'A' | 'a' | 'E' | 'e' | 'I' | 'i' | 'O' | 'o' | 'U' | 'u') {  
+        //     // Do nothing  
+        // } else {  
+        //     ret.push(i);  
+        // } 
+        if matches!(i, 'A' | 'a' | 'E' | 'e' | 'I' | 'i' | 'O' | 'o' | 'U' | 'u') == false {
+            ret.push(i);
+        }
+    }
+    ret
+}
+
 fn positive_sum(slice: &[i32]) -> i32 {
     //slice.iter().filter(|&&x| x > 0).sum()
     let mut ret = 0;
@@ -97,5 +124,18 @@ mod tests {
     #[test]
     fn all_negative() {
         assert_eq!(positive_sum(&[-1,-2,-3,-4,-5]), 0);
+    }
+
+    #[test]
+    fn example_test() {
+        assert_eq!(disemvowel("This website is for losers LOL!"), "Ths wbst s fr lsrs LL!");
+    }
+
+    #[test]
+    fn returns_expected() {
+      assert_eq!(string_to_number("1234"), 1234);
+      assert_eq!(string_to_number("605"), 605);
+      assert_eq!(string_to_number("1405"), 1405);
+      assert_eq!(string_to_number("-7"), -7);
     }
 }
