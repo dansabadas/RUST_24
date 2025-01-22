@@ -1,7 +1,103 @@
+use std::{ops::Deref, vec::IntoIter};
+
 fn main() {
     println!("Hello, world!");
     let buf = Buffer::from([0, 1, 2, 3]);
     dbg!(&buf);
+    println!("{}",sum_two_smallest_numbers(&[15, 28, 4, 2, 43]));
+    println!("{}",get_middle("testing"));
+    println!("{}",&"testing"[1..2]);
+
+    let wrapped_vec = WrappedVec(vec![1, 2, 3]);
+    wrapped_vec.iter().for_each(|v| println!("{}", v));
+    wrapped_vec.into_iter().for_each(|v| println!("{}", v));
+
+    let forward = vec![1, 2, 3];
+    let reversed = forward.reversed();
+    dbg!(&forward);
+    dbg!(&reversed);
+
+    let other_reversed = reversed.iter().to_reversed();
+    dbg!(&other_reversed);
+}
+
+struct WrappedVec<T>(Vec<T>);
+
+impl<T> Deref for WrappedVec<T> {
+    type Target = Vec<T>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> WrappedVec<T> {
+    fn into_iter(self) -> IntoIter<T> {
+        self.0.into_iter()
+    }
+}
+
+pub trait ReverseExt<T> {
+    fn reversed(&self) -> Vec<T>;
+}
+
+impl<T> ReverseExt<T> for Vec<T>
+where
+    T: Clone,
+{
+    fn reversed(&self) -> Vec<T> {
+        self.iter().rev().cloned().collect()
+    }
+}
+
+pub trait DoubleEndedIteratorExt: DoubleEndedIterator {
+    fn to_reversed<'a, T>(self) -> Vec<T>
+    where
+        T: 'a + Clone,
+        Self: Sized + Iterator<Item = &'a T>;
+}
+
+impl<I: DoubleEndedIterator> DoubleEndedIteratorExt for I {
+    fn to_reversed<'a, T>(self) -> Vec<T>
+    where
+        T: 'a + Clone,
+        Self: Sized + Iterator<Item = &'a T>,
+    {
+        self.rev().cloned().collect()
+    }
+}
+
+fn get_middle(s:&str) -> &str {
+    let len = s.len();
+    if len % 2 == 0 {
+        &s[len/2-1..len/2+1]
+    } else {
+        &s[len/2..(len/2)+1]
+    }
+}
+
+fn sum_two_smallest_numbers(numbers: &[u32]) -> u32 {
+    //let mut sorted = numbers.to_owned();
+    // let mut numbers = numbers.to_vec();
+    // numbers.sort();
+    // numbers[..2].iter().sum()
+
+    let mut lowest1 = numbers[0]; 
+    let mut lowest2 = if numbers[1] > lowest1 { 
+        numbers[1] 
+    } else {
+        lowest1 = numbers[1]; 
+        numbers[0] 
+    };
+
+    for &i in numbers[2..].iter() {
+        if i < lowest1 {
+            lowest2 = lowest1;
+            lowest1 = i;
+        } else if i < lowest2 {
+            lowest2 = i;
+        }
+    }
+    lowest1 + lowest2
 }
 
 fn string_to_number(s: &str) -> i32 {
@@ -137,5 +233,23 @@ mod tests {
       assert_eq!(string_to_number("605"), 605);
       assert_eq!(string_to_number("1405"), 1405);
       assert_eq!(string_to_number("-7"), -7);
+    }
+
+    #[test]
+    fn sum_two_smallest_numbers_tests() {
+        assert_eq!(sum_two_smallest_numbers(&[5, 8, 12, 19, 22]),  13, "Incorrect result for [5, 8, 12, 19, 22]");
+        assert_eq!(sum_two_smallest_numbers(&[15, 28, 4, 2, 43]), 6, "Incorrect result for [15, 28, 4, 2, 43]");
+        assert_eq!(sum_two_smallest_numbers(&[23, 71, 33, 82, 1]), 24, "Incorrect result for [23, 71, 33, 82, 1]");
+        assert_eq!(sum_two_smallest_numbers(&[52, 76, 14, 12, 4]), 16, "Incorrect result for [52, 76, 14, 12, 4]");
+        assert_eq!(sum_two_smallest_numbers(&[1, 1, 5, 5]),  2, "Incorrect result for [1, 1, 5, 5]");
+    }
+
+    #[test]
+    fn example_get_middle_tests() {
+        assert_eq!(get_middle("test"),"es");
+        assert_eq!(get_middle("testing"),"t");
+        assert_eq!(get_middle("middle"),"dd");
+        assert_eq!(get_middle("A"),"A");
+        assert_eq!(get_middle("of"),"of");
     }
 }
