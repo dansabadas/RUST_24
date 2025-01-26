@@ -21,6 +21,40 @@ fn main() {
     dbg!(&other_reversed);
 }
 
+fn fake_bin(s: &str) -> String {
+    s
+        .chars()
+        .map(|c| if c >= '5' { '1' } else { '0' })
+        .collect()
+}
+
+fn rental_car_cost(d: u32) -> u32 {
+    let product  = d*40;
+    // match d {
+    //     0..2 => product,
+    //     3..6 => product - 20,
+    //     _ => product - 50,
+    // }
+    match d {
+        d if d <= 2  => product,
+        d if d <= 6  => product - 20,
+        _ => product - 50,
+    }
+}
+
+fn printer_error(s: &str) -> String {
+    // let mut errors = 0;
+    // let len = s.len();
+    // for i in s.chars() {
+    //     if i > 'm' {
+    //         errors += 1;
+    //     }
+    // }
+    // format!("{errors}/{len}")
+
+    format!("{}/{}", s.chars().filter(|&c| c > 'm').count(), s.len())
+}
+
 struct WrappedVec<T>(Vec<T>);
 
 impl<T> Deref for WrappedVec<T> {
@@ -251,5 +285,39 @@ mod tests {
         assert_eq!(get_middle("middle"),"dd");
         assert_eq!(get_middle("A"),"A");
         assert_eq!(get_middle("of"),"of");
+    }
+
+    #[test]
+    fn should_pass_all_the_tests_provided() {
+        assert_eq!(&printer_error("aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbmmmmmmmmmmmmmmmmmmmxyz"), "3/56");
+        assert_eq!(&printer_error("kkkwwwaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbmmmmmmmmmmmmmmmmmmmxyz"), "6/60");
+        assert_eq!(&printer_error("kkkwwwaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbmmmmmmmmmmmmmmmmmmmxyzuuuuu"), "11/65");
+    }
+
+    fn dotest3(d: u32, expected: u32) {
+        let actual = rental_car_cost(d);
+        assert_eq!(
+            actual, expected,
+            "You result: \"{}\" did not match the expected output: \"{}\"",
+            actual, expected
+        );
+    }
+
+    #[test]
+    fn sample_tests() {
+        dotest3(1, 40);
+        dotest3(4, 140);
+        dotest3(7, 230);
+        dotest3(8, 270);
+        dotest3(0, 0);
+    }
+
+    #[test]
+    fn basic_tests2() {
+        assert_eq!(fake_bin("45385593107843568"), "01011110001100111");
+        assert_eq!(fake_bin("509321967506747"), "101000111101101");
+        assert_eq!(fake_bin("366058562030849490134388085"), "011011110000101010000011011");
+        assert_eq!(fake_bin("15889923"), "01111100");
+        assert_eq!(fake_bin("800857237867"), "100111001111");
     }
 }
