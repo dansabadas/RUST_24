@@ -14,6 +14,14 @@ fn main() {
     }
 }
 
+fn dna_to_rna(dna: &str) -> String {
+    //dna.chars().map(|c| if c == 'T' { 'U' } else { c }).collect()
+    dna.chars().map(|c| match c {
+        'T' => 'U',
+        _ => c
+    }).collect()
+}
+
 pub trait SessionState {}
 
 #[derive(Debug, Default)]
@@ -107,3 +115,14 @@ impl Session<Authenticated> {
         }
     }
 }        
+
+#[cfg(test)]
+mod tests {
+    use super::dna_to_rna;
+
+    #[test]
+    fn returns_expected() {
+      assert_eq!(dna_to_rna("TTTT"), "UUUU");
+      assert_eq!(dna_to_rna("GCAT"), "GCAU");
+    }
+}
