@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData};
+use std::{cell::RefCell, collections::HashMap, marker::PhantomData};
 
 use uuid::Uuid;
 
@@ -11,7 +11,63 @@ fn main() {
         println!("{:?}", session);
         let session = session.logout();
         println!("{:?}", session);
+        
     }
+    series_sum(3);
+    let a = 1;
+    let b = 2;
+    mutability(a, b);
+    dbg!(b);
+
+    let immutable_string = String::from("This string cannot be changed");
+    // immutable_string.push_str("... or can it?"); // error: cannot borrow `immutable_string` as mutable, as it is not declared as mutable
+    dbg!(&immutable_string);
+    let not_so_immutable_string = RefCell::from(immutable_string);
+    not_so_immutable_string
+        .borrow_mut()
+        .push_str("... or can it?");
+    dbg!(&not_so_immutable_string);
+    //dbg!(&immutable_string);
+}
+
+
+fn get_grade(s1: u16, s2: u16, s3: u16) -> char {
+    let avg = (s1 + s2 + s3) as f64/3.0;
+    
+    match avg {
+        x if x <= 100.0 && x >= 90.0 => 'A',
+        x if (80.0..90.0).contains(&x) => 'B',
+        x if (70.0..80.0).contains(&x) => 'C',
+        x if (60.0..70.0).contains(&x) => 'D',
+        x if (0.0..60.0).contains(&x) => 'F',
+        _ => 'F'
+    }
+}
+
+fn mutability(
+    a: i32, // immutable
+    mut b: i32, // mutable
+    ) {
+    // a += 1; // error: cannot assign twice to immutable variable `a`
+    b += 1;
+    dbg!(a);
+    dbg!(b);
+}
+
+fn series_sum(n: u32) -> String {
+    // let mut sum: f64 = if n == 0 { 0.0 } else { 1.0 };
+    // let mut cur_iter = 1;
+    // for _ in 2..=n {
+    //     cur_iter += 3;
+    //     sum += 1.0/cur_iter as f64;
+    // }
+
+    // let stepped: Vec<u32> = (1..3*n+1).step_by(3).collect();
+    // println!("{:?}", stepped);
+    // let stepped2 = (1..3*n+1).step_by(3).fold(0.0, |acc, i| acc + 1.0/i as f64);
+    // println!("{:?}", format!("{:.2}", stepped2));
+    // format!("{:.2}", sum)
+    format!("{:.2}", (1..3*n+1).step_by(3).fold(0.0, |acc, i| acc + 1.0/i as f64))
 }
 
 fn dna_to_rna(dna: &str) -> String {
@@ -118,11 +174,43 @@ impl Session<Authenticated> {
 
 #[cfg(test)]
 mod tests {
-    use super::dna_to_rna;
+    use super::*;
 
     #[test]
     fn returns_expected() {
       assert_eq!(dna_to_rna("TTTT"), "UUUU");
       assert_eq!(dna_to_rna("GCAT"), "GCAU");
+    }
+
+    fn test_strageSum(input: u32, expected: &str) {
+        let actual = series_sum(input);
+        assert!(actual == expected, "Expected series_sum({input}) to be {expected}, but was {actual}");
+    }
+
+    #[test]
+    fn sample_tests() {
+        test_strageSum(1, "1.00");
+        test_strageSum(2, "1.25");
+        test_strageSum(3, "1.39");
+        test_strageSum(7, "1.68");
+        test_strageSum(39, "2.26");
+        test_strageSum(0, "0.00");
+    }
+
+    fn dotest_grade(s1: u16, s2: u16, s3: u16, expected: char) {
+        let actual = get_grade(s1, s2, s3);
+        assert!(actual == expected, 
+            "With s1 = {s1}, s2 = {s2}, s = {s3}\nExpected '{expected}' but got '{actual}'")
+    }
+    
+    #[test]
+    fn test_get_grade() {
+        dotest_grade(100,100,100, 'A');
+        dotest_grade(95,90,93, 'A');
+        dotest_grade(82,85,87, 'B');
+        dotest_grade(60,82,76, 'C');
+        dotest_grade(58,62,70, 'D');
+        dotest_grade(58,59,60, 'F');
+        dotest_grade(0,0,0, 'F');
     }
 }
