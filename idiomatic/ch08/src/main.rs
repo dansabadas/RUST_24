@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, marker::PhantomData};
+use std::{borrow::Cow, cell::RefCell, collections::HashMap, marker::PhantomData};
 
 use uuid::Uuid;
 
@@ -28,8 +28,34 @@ fn main() {
         .push_str("... or can it?");
     dbg!(&not_so_immutable_string);
     //dbg!(&immutable_string);
+
+    let cow_say_what = Cow::from("The cow goes moo");
+    dbg!(&cow_say_what);
+    let cows_dont_say_what =
+    cow_say_what
+        .clone()
+        .to_mut()
+        .replace("moo", "toot");
+    dbg!(&cow_say_what);
+    dbg!(&cows_dont_say_what);
 }
 
+fn string_to_array(s: &str) -> Vec<String> {
+    s
+        .split(' ')
+        .map(|str| String::from(str))
+        .collect()
+}
+
+fn double_char(s: &str) -> String {
+    let mut ret = String::new();
+    for i in s.chars(){
+        ret.push(i);
+        ret.push(i);
+    }
+
+    ret
+}
 
 fn get_grade(s1: u16, s2: u16, s3: u16) -> char {
     let avg = (s1 + s2 + s3) as f64/3.0;
@@ -212,5 +238,18 @@ mod tests {
         dotest_grade(58,62,70, 'D');
         dotest_grade(58,59,60, 'F');
         dotest_grade(0,0,0, 'F');
+    }
+
+    fn do_stringtoarray_test(s: &str, expected: &[&str]) {
+        let actual = string_to_array(s);
+        assert!(actual == expected, "Test failed with s = \"{s}\"\nExpected {expected:?} but got {actual:?}")
+    }
+
+    #[test]
+    fn stringtoarra_fixed_tests() {
+        do_stringtoarray_test("Robin Singh", &["Robin", "Singh"]);
+        do_stringtoarray_test("CodeWars", &["CodeWars"]);
+        do_stringtoarray_test("I love arrays they are my favorite", &["I", "love", "arrays", "they", "are", "my", "favorite"]);
+        do_stringtoarray_test("1 2 3", &["1", "2", "3"]);
     }
 }
