@@ -1,3 +1,5 @@
+//use bit_vec::BitVec;  
+
 fn main() {
     let holder = StringHolder {
         data: String::from("Struct-owned string"),
@@ -26,6 +28,72 @@ fn main() {
     println!("{:?}", b"This will look like numbers");
     println!("\u{D589}, \u{48}, \u{5C45}, \u{3044}");
     println!("{:X}", 'い' as u32);
+    println!("ModularAddition(29, 87, 99)={}", ModularAddition(29, 87, 99));
+    println!("u8_to_truncated_bits(9)={:?}", u8_to_truncated_bits(9));
+    println!("ModularMultiplication(7, 8, 9)={}", ModularMultiplication(7, 8, 9));
+    println!("ModularExponentiation(8, 2, 9)={}", ModularExponentiation(8, 2, 9));
+}
+
+fn ModularAddition(a: u8, b: u8, n: u8) -> u8{
+    //return c = a + b (mod n)
+    match n - a {
+        x if x > b => a + b,
+        x if x <= b => b - x,
+        _ => panic!()
+    }
+}
+
+fn u8_to_truncated_bits(input: u8) -> Vec<u8> {  
+    let mut bits = Vec::new();  
+    let mut found_one = false; // Flag to skip leading zeroes  
+  
+    for i in (0..8).rev() { // Iterate from most significant bit to least significant bit  
+        let bit = (input >> i) & 1; // Extract the bit  
+        if bit == 1 {  
+            found_one = true; // Start collecting once we see the first `1`  
+        }  
+        if found_one {  
+            bits.push(bit);  
+        }  
+    }  
+  
+    if bits.is_empty() {  
+        bits.push(0); // Special case: input is 0, return a single 0  
+    }  
+  
+    bits  
+} 
+
+fn ModularMultiplication(a: u8, b: u8, n: u8) -> u8 {
+    //return c = a * b (mod n)
+    let A = u8_to_truncated_bits(a);
+    let mut r = 0;
+    let mut s = b;
+
+    for i in A.iter().rev() {
+        if i == &1 {
+            r = ModularAddition(r, s, n);
+        }
+        s = ModularAddition(s, s, n);
+    }
+    
+    r
+}
+
+fn ModularExponentiation(a: u8, e: u8, n: u8) -> u8 {
+     //return c = a ^ e (mod n)
+    let A = u8_to_truncated_bits(e);
+    let mut r = 1;
+    let mut m = a;
+
+    for i in A.iter().rev() {
+        if i == &1 {
+            r = ModularMultiplication(r, m, n);
+        }
+        m = ModularMultiplication(m, m, n);
+    }
+    
+    r
 }
 
 fn reverse_words(str: &str) -> String {
