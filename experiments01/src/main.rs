@@ -28,6 +28,15 @@ fn main() {
     println!("{:X}", 'い' as u32);
 }
 
+fn reverse_words(str: &str) -> String {
+    // your code here
+    str
+        .split(' ')   
+        .map(|w| w.chars().rev().collect::<String>())
+        .collect::<Vec<String>>()
+        .join(" ")
+}
+
 fn first_non_consecutive(arr: &Vec<i32>) -> Option<i32> {
     // let mut currentlyIterated = arr[0] - 1;
     // for &i in arr {
@@ -83,5 +92,13 @@ mod tests {
         assert_eq!(first_non_consecutive(&vec![31,32]), None);
         assert_eq!(first_non_consecutive(&vec![-3,-2,0,1]), Some(0));
         assert_eq!(first_non_consecutive(&vec![-5,-4,-3,-1]), Some(-1));
+    }
+
+    #[test]
+    fn sample_test2() {
+        assert_eq!(reverse_words("The quick brown fox jumps over the lazy dog."), "ehT kciuq nworb xof spmuj revo eht yzal .god");
+        assert_eq!(reverse_words("apple"), "elppa");
+        assert_eq!(reverse_words("a b c d"),"a b c d");
+        assert_eq!(reverse_words("double  spaced  words"), "elbuod  decaps  sdrow");
     }
 }
