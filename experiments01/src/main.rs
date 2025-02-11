@@ -32,6 +32,10 @@ fn main() {
     println!("u8_to_truncated_bits(9)={:?}", u8_to_truncated_bits(9));
     println!("ModularMultiplication(7, 8, 9)={}", ModularMultiplication(7, 8, 9));
     println!("ModularExponentiation(8, 2, 9)={}", ModularExponentiation(8, 2, 9));
+    print!("{}\n", square_digits(9119));
+    println!("ModularMultipliveInverse(2, 11)={}", ModularMultipliveInverse(2, 11));
+    println!("ModularMultipliveInverse(3, 7)={}", ModularMultipliveInverse(3, 7));
+    println!("ModularNegative(13, 29)={}", ModularNegative(13, 29));
 }
 
 fn ModularAddition(a: u8, b: u8, n: u8) -> u8{
@@ -41,6 +45,12 @@ fn ModularAddition(a: u8, b: u8, n: u8) -> u8{
         x if x <= b => b - x,
         _ => panic!()
     }
+}
+
+fn ModularNegative(a: u8, n: u8) -> u8{
+    //return c = -a (mod n)
+    
+    n-a
 }
 
 fn u8_to_truncated_bits(input: u8) -> Vec<u8> {  
@@ -96,6 +106,13 @@ fn ModularExponentiation(a: u8, e: u8, n: u8) -> u8 {
     r
 }
 
+fn ModularMultipliveInverse(a: u8, n: u8) -> u8 {
+    //return c = 1/a (mod n) where gcd(a, n) = 1  
+    //Ferman't little theorem <=> a^(n-1)~1(mod n)
+
+    ModularExponentiation(a, n-2, n)
+}
+
 fn reverse_words(str: &str) -> String {
     // your code here
     str
@@ -147,9 +164,28 @@ impl StringHolder {
 //     country_ref
 // }//
 
+fn square_digits(num: u64) -> u64 {
+    let mut num = num;
+    let mut digits = Vec::new();  
+    loop {
+        let digit = num % 10;
+        digits.push((digit*digit).to_string());
+        num = num / 10;
+        if num == 0 {break;}
+    }
+    digits.reverse();
+
+    digits.join("").parse::<u64>().unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_square_digits() {
+        assert_eq!(square_digits(9119), 811181, "\nFailed with num 9119");
+    }
 
     #[test]
     fn test_consecutivevec_basic() {
