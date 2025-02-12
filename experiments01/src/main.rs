@@ -1,5 +1,7 @@
 //use bit_vec::BitVec;  
 
+use std::collections::{HashMap, HashSet};
+
 fn main() {
     let holder = StringHolder {
         data: String::from("Struct-owned string"),
@@ -36,6 +38,63 @@ fn main() {
     println!("ModularMultipliveInverse(2, 11)={}", ModularMultipliveInverse(2, 11));
     println!("ModularMultipliveInverse(3, 7)={}", ModularMultipliveInverse(3, 7));
     println!("ModularNegative(13, 29)={}", ModularNegative(13, 29));
+    quarter_of(11);
+
+    // Create and populate the HashMap  
+    let mut my_map: HashMap<char, u8> = HashMap::new();  
+    my_map.insert('a', 3);  
+    my_map.insert('b', 2);  
+    my_map.insert('c', 3);  
+    my_map.insert('d', 1);  
+  
+    println!("HashMap: {:?}", my_map);  
+  
+    // Count how many values are equal to 3  
+    let count = my_map.values().filter(|&&v| v == 3).count();  
+  
+    println!("Number of values equal to 3: {}", count);  
+}
+
+fn get_count(string: &str) -> usize {
+    let mut vowels_count: usize = 0;
+  
+    for c in string.chars() {
+        if "aeiou".contains(c){
+            vowels_count += 1;
+        }
+        // match c {
+        //     'a' => { vowels_count += 1; },
+        //     'e' => { vowels_count += 1; },
+        //     'i' => { vowels_count += 1; },
+        //     'o' => { vowels_count += 1; },
+        //     'u' => { vowels_count += 1; },
+        //     _ => {}
+        // }
+    }
+    
+    vowels_count
+}
+
+fn count_duplicates(text: &str) -> u32 {
+    let mut repeated_chars: Vec<char> = Vec::new(); 
+    let mut ret = HashSet::new(); 
+    for c in text.chars() {
+        if repeated_chars.contains(&c){
+            ret.insert(c);
+        } else {
+            repeated_chars.push(c);
+        }
+    }
+
+    ret.len() as u32
+}
+
+fn quarter_of(month: u8) -> u8 {
+    (month-1)/3 + 1
+}
+
+fn get_age(age: &str) -> u32 {
+    age.chars().next().unwrap().to_string().parse::<u32>().unwrap()
 }
 
 fn ModularAddition(a: u8, b: u8, n: u8) -> u8{
@@ -204,5 +263,32 @@ mod tests {
         assert_eq!(reverse_words("apple"), "elppa");
         assert_eq!(reverse_words("a b c d"),"a b c d");
         assert_eq!(reverse_words("double  spaced  words"), "elbuod  decaps  sdrow");
+    }
+
+    #[test]
+    fn basic_age_tests() {
+        assert_eq!(get_age("2 years old"), 2);
+        assert_eq!(get_age("4 years old"), 4);
+        assert_eq!(get_age("5 years old"), 5);
+        assert_eq!(get_age("7 years old"), 7);
+    }
+
+    #[test]
+    fn basic() {
+        assert_eq!(quarter_of(3), 1, "Month 3 = quarter 1");
+        assert_eq!(quarter_of(8), 3, "Month 8 = quarter 3");
+        assert_eq!(quarter_of(11), 4, "Month 11 = quarter 4");
+    }  
+
+    #[test]
+    fn test_duplicates() {
+        assert_eq!(count_duplicates("abcde"), 0);
+        assert_eq!(count_duplicates("abcdea"), 1);
+        assert_eq!(count_duplicates("indivisibility"), 1);
+    }
+
+    #[test]
+    fn my_tests_vowels_count() {
+        assert_eq!(get_count("abracadabra"), 5);
     }
 }
