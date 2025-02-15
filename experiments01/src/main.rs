@@ -70,6 +70,10 @@ fn main() {
     println!("next_item(&[Joe, Bob, Sally], Bob): {:?}", next_item(&["Joe", "Bob", "Sally"], "Bob")); 
 }
 
+fn count_by(x: u32, n: u32) -> Vec<u32> {
+    (1..=n).map(|i| i*x).collect()
+}
+
 fn collinearity(x1: i32, y1: i32, x2: i32, y2: i32) -> bool {
     if x1 == 0 && y1 == 0 || x2 == 0 && y2 == 0 { return true; }
     if x1 == 0 && x2 == 0 { return true; }
@@ -318,6 +322,7 @@ fn square_digits(num: u64) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use itertools::Itertools;
 
     #[test]
     fn test_square_digits() {
@@ -439,5 +444,29 @@ mod tests {
         do_colin_test(0, 0, 0, 0, true);
         do_colin_test(0, 0, 1, 0, true);
         do_colin_test(5, 7, 0, 0, true);
+    }
+
+
+    
+    #[test]
+    fn sample_tests() {
+        assertion(vec![1,2,3,4,5,6,7,8,9,10], (1, 10));
+        assertion(vec![2,4,6,8,10], (2, 5));
+        assertion(vec![3,6,9,12,15,18,21], (3, 7));
+        assertion(vec![50,100,150,200,250], (50, 5));
+        assertion(vec![100,200,300,400,500,600], (100, 6));
+    }
+    
+    fn assertion(expected : Vec<u32>, inputs : (u32, u32)) {
+        let actual = count_by(inputs.0, inputs.1);
+        
+        assert!(
+            expected == actual,
+            "\nTest failed!\n expected: [{}]\n actual: [{}]\n x: {}\n n: {}\n"
+            , expected.iter().join(", ")
+            , actual.iter().join(", ")
+            , inputs.0
+            , inputs.1
+        );
     }
 }
