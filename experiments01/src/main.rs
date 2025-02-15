@@ -54,6 +54,67 @@ fn main() {
   
     println!("Number of values equal to 3: {}", count);  
     println!("tribonacci(&[3., 2., 1.], 1): {:?}", tribonacci(&[1., 1., 1.], 1));  
+    //&longest_consec(strarr, k), exp)
+    println!("longest_consec: {}", longest_consec(vec!["ejjjjmmtthh", "zxxuueeg", "aanlljrrrxx", "dqqqaaabbb", "oocccffuucccjjjkkkjyyyeehh"], 1));  
+    let kalmykia = Country {
+        population: 500_000,
+        capital: String::from("Elista"),
+        leader_name: String::from("Batu Khasikov")
+    };
+    // let kalmykia2 = Country {
+    //     500_000,
+    //     String::from("Elista"),
+    //     String::from("Batu Khasikov")
+    // };
+    //
+    println!("next_item(&[Joe, Bob, Sally], Bob): {:?}", next_item(&["Joe", "Bob", "Sally"], "Bob")); 
+}
+
+fn collinearity(x1: i32, y1: i32, x2: i32, y2: i32) -> bool {
+    if x1 == 0 && y1 == 0 || x2 == 0 && y2 == 0 { return true; }
+    if x1 == 0 && x2 == 0 { return true; }
+    if y1 == 0 && y2 == 0 { return true; }
+    if (y1 as f32/x1 as f32) == (y2 as f32/x2 as f32) { return true; }
+    false
+}
+
+fn next_item<T: PartialEq<T> + Clone>(slice: &[T], find: T) -> Option<T> {
+    match slice.iter().position(|x| *x == find) {
+        Some(index) => { 
+            match index != slice.len()-1 {
+                true => Some(slice[index+1].clone()),
+                false => None
+            }
+        },
+        None => None
+    }
+}
+
+struct Country {
+    population: u32,
+    capital: String,
+    leader_name: String
+}
+
+fn longest_consec(strarr: Vec<&str>, k: usize) -> String {
+    if k > strarr.len() || k == 0 || strarr.len() == 0 { String::new() } else {
+        strarr.windows(k).map(|x| { x.join("") }).max_by_key(String::len).unwrap()
+    }
+}
+
+fn longest_consec2(strarr: Vec<&str>, k: usize) -> String {
+    if strarr.len() == 0 || k > strarr.len() || k <= 0 { return String::from(""); }
+    let mut biggest_string = String::new();
+    let mut biggest_length = 0; 
+    for i in 0..strarr.len() - k + 1 {
+        let curr_str = strarr[i..k+i].join("");
+        if curr_str.len() > biggest_length {
+            biggest_length = curr_str.len();
+            biggest_string = curr_str;
+        }
+    }
+    
+    biggest_string.clone()
 }
 
 fn tribonacci(signature: &[f64; 3], n: usize) -> Vec<f64> {
@@ -319,5 +380,64 @@ mod tests {
         assert_eq!(tribonacci(&[1., 1., 1.], 1), vec![1.]);
         assert_eq!(tribonacci(&[300., 200., 100.], 0), vec![]);
         assert_eq!(tribonacci(&[0.5, 0.5, 0.5], 30), vec![0.5, 0.5, 0.5, 1.5, 2.5, 4.5, 8.5, 15.5, 28.5, 52.5, 96.5, 177.5, 326.5, 600.5, 1104.5, 2031.5, 3736.5, 6872.5, 12640.5, 23249.5, 42762.5, 78652.5, 144664.5, 266079.5, 489396.5, 900140.5, 1655616.5, 3045153.5, 5600910.5, 10301680.5]);
+    }
+
+    fn testing(strarr: Vec<&str>, k: usize, exp: &str) -> () {
+        assert_eq!(&longest_consec(strarr, k), exp)
+    }
+
+    #[test]
+    fn basics_longest_consec() {
+        testing(vec!["zone", "abigail", "theta", "form", "libe", "zas"], 2, "abigailtheta");
+        testing(vec!["ejjjjmmtthh", "zxxuueeg", "aanlljrrrxx", "dqqqaaabbb", "oocccffuucccjjjkkkjyyyeehh"], 1, 
+            "oocccffuucccjjjkkkjyyyeehh");
+        testing(vec![], 3, "");
+        testing(vec!["it","wkppv","ixoyx", "3452", "zzzzzzzzzzzz"], 3, "ixoyx3452zzzzzzzzzzzz");
+        testing(vec!["it","wkppv","ixoyx", "3452", "zzzzzzzzzzzz"], 15, "");
+        testing(vec!["it","wkppv","ixoyx", "3452", "zzzzzzzzzzzz"], 0, "");
+    }
+
+    #[test]
+    fn returns_expected() {
+    assert_eq!(next_item(&["Joe", "Bob", "Sally"], "Bob"), Some("Sally"));
+    assert_eq!(next_item(&[0, 1], 0), Some(1));
+    assert_eq!(next_item(&[0, 1], 1), None);
+    assert_eq!(next_item((1..10).collect::<Vec<_>>().as_slice(), 7), Some(8));  
+    }
+
+    fn do_colin_test(x1: i32, y1: i32, x2: i32, y2: i32, expected: bool) {
+        assert_eq!(
+            collinearity(x1, y1, x2, y2),
+            expected,
+            "Input: ({x1}, {y1}, {x2}, {y2})"
+        );
+    }
+
+    #[test]
+    fn test_fixed_one_direction() {
+        do_colin_test(1, 1, 1, 1, true);
+        do_colin_test(1, 2, 2, 4, true);
+        do_colin_test(1, 2, 3, 7, false);
+    }
+
+    #[test]
+    fn test_fixed_opposite_direction() {
+        do_colin_test(1, 1, 6, 1, false);
+        do_colin_test(1, 2, -1, -2, true);
+        do_colin_test(1, 2, 1, -2, false);
+    }
+
+    #[test]
+    fn test_fixed_vectors_contain_zero() {
+        do_colin_test(4, 0, 11, 0, true);
+        do_colin_test(0, 1, 6, 0, false);
+        do_colin_test(4, 4, 0, 4, false);
+    }
+
+    #[test]
+    fn test_fixed_vector_with_0_0_coordinates() {
+        do_colin_test(0, 0, 0, 0, true);
+        do_colin_test(0, 0, 1, 0, true);
+        do_colin_test(5, 7, 0, 0, true);
     }
 }
